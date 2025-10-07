@@ -1,9 +1,13 @@
 import os
 from pathlib import Path
+import sys
 from datetime import timedelta
+
 
 # Базовые пути для проекта CreatingTasks
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'creating-tasks-dev-secret-key-2024')
 PROJECT_NAME = "CreatingTasks"
