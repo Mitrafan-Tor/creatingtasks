@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CreatingTasks - Управление задачами{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div id="app">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="container">
+                <h1>📋 CreatingTasks</h1>
+                <div class="user-info">
+                    <span id="username">Гость</span>
+                    {% if user.is_authenticated %}
+                        <button id="logout-btn" class="btn btn-secondary">Выйти</button>
+                    {% else %}
+                        <button id="login-btn" class="btn btn-primary">Войти</button>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main">
+            <div class="container">
+                {% if user.is_authenticated %}
+                <!-- Навигация -->
+                <nav class="nav">
+                    <button class="nav-btn active" data-section="tasks-section">📋 Мои задачи</button>
+                    <button class="nav-btn" data-section="task-lists-section">📁 Списки задач</button>
+                    <button class="nav-btn" data-section="notifications-section">🔔 Уведомления</button>
+                    <button class="nav-btn" data-section="profile-section">👤 Профиль</button>
+                </nav>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        {% block modals %}{% endblock %}
+    </div>
+
+    <!-- CSRF токен для Django -->
+    {% csrf_token %}
+
+    <!-- JavaScript -->
+    <script src="/static/js/app.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

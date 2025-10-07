@@ -1,12 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TaskListViewSet, TaskViewSet
+from . import views
 
 router = DefaultRouter()
-router.register(r'lists', TaskListViewSet)
-router.register(r'tasks', TaskViewSet)
-# Пока полностью убираем comments
-# router.register(r'comments', CommentViewSet)
+router.register(r'lists', views.TaskListViewSet)
+router.register(r'tasks', views.TaskViewSet)
+router.register(r'comments', views.CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(router.urls)),

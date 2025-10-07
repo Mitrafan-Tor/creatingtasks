@@ -1,129 +1,200 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CreatingTasks - Управление задачами</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div id="app">
-        <!-- Шапка -->
-        <header class="header">
-            <div class="container">
-                <h1>📋 CreatingTasks</h1>
-                <div class="user-info">
-                    <span id="username">Гость</span>
-                    <button id="logout-btn" class="btn btn-secondary" style="display: none;">Выйти</button>
-                    <button id="login-btn" class="btn btn-primary">Войти</button>
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Секция списков задач -->
+    <section id="task-lists-section" class="content-section">
+        <div class="section-header">
+            <h2>📁 Мои списки задач</h2>
+            <button class="btn btn-primary" id="create-task-list-btn">+ Создать список</button>
+        </div>
+        <div id="task-lists-container" class="cards-container">
+            <!-- Списки задач будут здесь -->
+        </div>
+    </section>
+
+    <!-- Секция задач -->
+    <section id="tasks-section" class="content-section hidden">
+        <div class="section-header">
+            <h2 id="current-list-name">📋 Задачи</h2>
+            <button class="btn btn-primary" id="create-task-btn">+ Новая задача</button>
+        </div>
+        <div id="tasks-container" class="cards-container">
+            <!-- Задачи будут здесь -->
+        </div>
+    </section>
+
+    <!-- Секция уведомлений -->
+    <section id="notifications-section" class="content-section hidden">
+        <div class="section-header">
+            <h2>🔔 Уведомления</h2>
+            <button class="btn btn-secondary" id="mark-all-read-btn">Отметить все как прочитанные</button>
+        </div>
+        <div id="notifications-container">
+            <!-- Уведомления будут здесь -->
+        </div>
+    </section>
+
+    <!-- Секция профиля -->
+    <section id="profile-section" class="content-section hidden">
+        <div class="section-header">
+            <h2>👤 Мой профиль</h2>
+        </div>
+        <div class="profile-content">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="Аватар">
+                        {% else %}
+                            <div class="avatar-placeholder">{{ user.username|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="profile-email">{{ user.email }}</p>
+                        {% if user.telegram_username %}
+                            <p class="profile-telegram">📱 Telegram: @{{ user.telegram_username }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ user.assigned_tasks.count }}</span>
+                        <span class="stat-label">Назначенных задач</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ user.created_tasks.count }}</span>
+                        <span class="stat-label">Созданных задач</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ user.task_lists.count }}</span>
+                        <span class="stat-label">Списков задач</span>
+                    </div>
                 </div>
             </div>
-        </header>
-
-        <!-- Основной контент -->
-        <main class="main">
-            <div class="container">
-                <!-- Навигация -->
-                <nav class="nav">
-                    <button class="nav-btn active" data-section="tasks-section">📋 Мои задачи</button>
-                    <button class="nav-btn" data-section="task-lists-section">📁 Списки задач</button>
-                    <button class="nav-btn" data-section="notifications-section">🔔 Уведомления</button>
-                </nav>
-
-                <!-- Секция списков задач -->
-                <section id="task-lists-section" class="content-section">
-                    <div class="section-header">
-                        <h2>📁 Мои списки задач</h2>
-                        <button class="btn btn-primary" id="create-task-list-btn">+ Создать список</button>
-                    </div>
-                    <div id="task-lists-container" class="cards-container">
-                        <!-- Списки задач будут здесь -->
-                    </div>
-                </section>
-
-                <!-- Секция задач -->
-                <section id="tasks-section" class="content-section hidden">
-                    <div class="section-header">
-                        <h2 id="current-list-name">📋 Задачи</h2>
-                        <button class="btn btn-primary" id="create-task-btn">+ Новая задача</button>
-                    </div>
-                    <div id="tasks-container" class="cards-container">
-                        <!-- Задачи будут здесь -->
-                    </div>
-                </section>
-
-                <!-- Секция уведомлений -->
-                <section id="notifications-section" class="content-section hidden">
-                    <div class="section-header">
-                        <h2>🔔 Уведомления</h2>
-                        <button class="btn btn-secondary" id="mark-all-read-btn">Отметить все как прочитанные</button>
-                    </div>
-                    <div id="notifications-container">
-                        <!-- Уведомления будут здесь -->
-                    </div>
-                </section>
-            </div>
-        </main>
-
-        <!-- Модальные окна -->
-        <div id="create-task-list-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3>Создать список задач</h3>
-                <form id="task-list-form">
-                    <div class="form-group">
-                        <label for="list-name">Название списка:</label>
-                        <input type="text" id="list-name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="list-description">Описание:</label>
-                        <textarea id="list-description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('create-task-list-modal')">Отмена</button>
-                        <button type="submit" class="btn btn-primary">Создать</button>
-                    </div>
-                </form>
-            </div>
         </div>
+    </section>
+{% endblock %}
 
-        <div id="create-task-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3>Создать задачу</h3>
-                <form id="task-form">
-                    <div class="form-group">
-                        <label for="task-title">Название задачи:</label>
-                        <input type="text" id="task-title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="task-description">Описание:</label>
-                        <textarea id="task-description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="task-priority">Приоритет:</label>
-                        <select id="task-priority" name="priority">
-                            <option value="low">🔵 Низкий</option>
-                            <option value="medium" selected>🟡 Средний</option>
-                            <option value="high">🟠 Высокий</option>
-                            <option value="urgent">🔴 Срочный</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="task-due-date">Срок выполнения:</label>
-                        <input type="datetime-local" id="task-due-date" name="due_date">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('create-task-modal')">Отмена</button>
-                        <button type="submit" class="btn btn-primary">Создать</button>
-                    </div>
-                </form>
+{% block modals %}
+    <!-- Модальные окна -->
+    <div id="create-task-list-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Создать список задач</h3>
+            <form id="task-list-form">
+                <div class="form-group">
+                    <label for="list-name">Название списка:</label>
+                    <input type="text" id="list-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="list-description">Описание:</label>
+                    <textarea id="list-description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="list-color">Цвет:</label>
+                    <input type="color" id="list-color" name="color" value="#3498db">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('create-task-list-modal')">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="create-task-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Создать задачу</h3>
+            <form id="task-form">
+                <div class="form-group">
+                    <label for="task-title">Название задачи:</label>
+                    <input type="text" id="task-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Описание:</label>
+                    <textarea id="task-description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Приоритет:</label>
+                    <select id="task-priority" name="priority">
+                        <option value="low">🔵 Низкий</option>
+                        <option value="medium" selected>🟡 Средний</option>
+                        <option value="high">🟠 Высокий</option>
+                        <option value="urgent">🔴 Срочный</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-due-date">Срок выполнения:</label>
+                    <input type="datetime-local" id="task-due-date" name="due_date">
+                </div>
+                <div class="form-group">
+                    <label for="task-assigned-to">Исполнитель:</label>
+                    <select id="task-assigned-to" name="assigned_to">
+                        <option value="">Не назначен</option>
+                        <!-- Users will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('create-task-modal')">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно входа -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Вход в систему</h3>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Имя пользователя:</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('login-modal')">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </div>
+            </form>
+            <div class="auth-links">
+                <p>Нет аккаунта? <a href="#" onclick="taskManager.showRegisterForm()">Зарегистрироваться</a></p>
             </div>
         </div>
     </div>
 
-    <!-- CSRF токен для Django -->
-    {% csrf_token %}
-
-    <!-- JavaScript -->
-    <script src="/static/js/app.js"></script>
-</body>
-</html>
+    <!-- Модальное окно регистрации -->
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Регистрация</h3>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-username">Имя пользователя:</label>
+                    <input type="text" id="register-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Пароль:</label>
+                    <input type="password" id="register-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password-confirm">Подтвердите пароль:</label>
+                    <input type="password" id="register-password-confirm" name="password_confirm" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('register-modal')">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </div>
+            </form>
+            <div class="auth-links">
+                <p>Уже есть аккаунт? <a href="#" onclick="taskManager.showLoginForm()">Войти</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

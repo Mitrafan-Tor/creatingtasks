@@ -6,7 +6,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/tasks/', include('apps.tasks.urls')),  # Только tasks API пока
+    path('api/auth/', include('apps.users.urls')),
+    path('api/tasks/', include('apps.tasks.urls')),
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
 ]
 
@@ -15,6 +16,7 @@ urlpatterns += [
     path('tasks/', TemplateView.as_view(template_name='index.html')),
     path('login/', TemplateView.as_view(template_name='index.html')),
     path('register/', TemplateView.as_view(template_name='index.html')),
+    path('profile/', TemplateView.as_view(template_name='index.html')),
 ]
 
 # Статические файлы в разработке

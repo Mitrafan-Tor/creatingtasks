@@ -3,7 +3,6 @@ from pathlib import Path
 import sys
 from datetime import timedelta
 
-
 # Базовые пути для проекта CreatingTasks
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -16,7 +15,7 @@ DEBUG = True
 ROOT_URLCONF = 'CreatingTasks.urls'
 WSGI_APPLICATION = 'CreatingTasks.wsgi.application'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 # Настройки приложений с префиксом CreatingTasks
 INSTALLED_APPS = [
@@ -44,18 +43,18 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Создайте папку templates если её нет
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,7 +75,6 @@ DATABASES = {
     }
 }
 
-# ДОБАВЬТЕ в начало файла (после импортов):
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redis для CreatingTasks
@@ -116,9 +114,19 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 # Static files для CreatingTasks
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'frontend/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files
@@ -133,7 +141,9 @@ SESSION_COOKIE_NAME = f"{PROJECT_NAME.lower()}_sessionid"
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME', 'CreatingTasksBot')
 
-os.makedirs(BASE_DIR / 'templates', exist_ok=True)
-os.makedirs(BASE_DIR / 'static', exist_ok=True)
-
 AUTH_USER_MODEL = 'users.User'
+
+# Создайте необходимые директории
+os.makedirs(BASE_DIR / 'templates', exist_ok=True)
+os.makedirs(BASE_DIR / 'staticfiles', exist_ok=True)
+os.makedirs(BASE_DIR / 'media', exist_ok=True)
