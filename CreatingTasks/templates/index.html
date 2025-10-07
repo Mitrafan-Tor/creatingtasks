@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreatingTasks - Управление задачами</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="container">
+                <h1>📋 CreatingTasks</h1>
+                <div class="user-info">
+                    <span id="username">Гость</span>
+                    <button id="logout-btn" class="btn btn-secondary" style="display: none;">Выйти</button>
+                    <button id="login-btn" class="btn btn-primary">Войти</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main">
+            <div class="container">
+                <!-- Навигация -->
+                <nav class="nav">
+                    <button class="nav-btn active" data-section="tasks-section">📋 Мои задачи</button>
+                    <button class="nav-btn" data-section="task-lists-section">📁 Списки задач</button>
+                    <button class="nav-btn" data-section="notifications-section">🔔 Уведомления</button>
+                </nav>
+
+                <!-- Секция списков задач -->
+                <section id="task-lists-section" class="content-section">
+                    <div class="section-header">
+                        <h2>📁 Мои списки задач</h2>
+                        <button class="btn btn-primary" id="create-task-list-btn">+ Создать список</button>
+                    </div>
+                    <div id="task-lists-container" class="cards-container">
+                        <!-- Списки задач будут здесь -->
+                    </div>
+                </section>
+
+                <!-- Секция задач -->
+                <section id="tasks-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2 id="current-list-name">📋 Задачи</h2>
+                        <button class="btn btn-primary" id="create-task-btn">+ Новая задача</button>
+                    </div>
+                    <div id="tasks-container" class="cards-container">
+                        <!-- Задачи будут здесь -->
+                    </div>
+                </section>
+
+                <!-- Секция уведомлений -->
+                <section id="notifications-section" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>🔔 Уведомления</h2>
+                        <button class="btn btn-secondary" id="mark-all-read-btn">Отметить все как прочитанные</button>
+                    </div>
+                    <div id="notifications-container">
+                        <!-- Уведомления будут здесь -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Модальные окна -->
+        <div id="create-task-list-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Создать список задач</h3>
+                <form id="task-list-form">
+                    <div class="form-group">
+                        <label for="list-name">Название списка:</label>
+                        <input type="text" id="list-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="list-description">Описание:</label>
+                        <textarea id="list-description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('create-task-list-modal')">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="create-task-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Создать задачу</h3>
+                <form id="task-form">
+                    <div class="form-group">
+                        <label for="task-title">Название задачи:</label>
+                        <input type="text" id="task-title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description">Описание:</label>
+                        <textarea id="task-description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-priority">Приоритет:</label>
+                        <select id="task-priority" name="priority">
+                            <option value="low">🔵 Низкий</option>
+                            <option value="medium" selected>🟡 Средний</option>
+                            <option value="high">🟠 Высокий</option>
+                            <option value="urgent">🔴 Срочный</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-due-date">Срок выполнения:</label>
+                        <input type="datetime-local" id="task-due-date" name="due_date">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="taskManager.hideModal('create-task-modal')">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSRF токен для Django -->
+    {% csrf_token %}
+
+    <!-- JavaScript -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
